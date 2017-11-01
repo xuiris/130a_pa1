@@ -41,21 +41,21 @@ map<int, string> suffixTrie::readfrom(Node* n) {
 	map<int, string> sentence, subsentence;
 	std::map<string, Node*>::iterator it;
 	std::map<int, string>::iterator subit;
-	// Base case (1): leaf node with weight
-	if (n->numchild == 0) {
-		sentence[n->weight] = (n->currword);
-		return sentence;
+	// Base case (1): n is leaf node with weight
+	if (n->numchild == 0 &&  n->weight > 0) {
+		sentence[n->weight] = n->currword;
+		return sentence; // return the word + weight in map
 	}
 
-	// Case 2: non-leaf node (has children)
+	// Case 2: n is non-leaf node (has children)
 	else{
-		for (it = n->children.begin(); it != n->children.end(); ++it) {
-			subsentence = readfrom(it->second);
-			subit = subsentence.begin();
-			sentence[subit->first] = (n->currword + " " + subit->second);
+		for (it = n->children.begin(); it != n->children.end(); ++it) { // for each child
+			subsentence = readfrom(it->second); // recurse, read (sub)sentences starting from child, put in map
+			subit = subsentence.begin(); // pointer to first+only element in subsentence map
+			sentence[subit->first] = (n->currword + " " + subit->second); // concatenate words, keep leaf weight and add to map
 		}
-		if (n->weight >= 0) { // for non-leaf with weight
-			sentence[n->weight] = n->currword;
+		if (n->weight >= 0) { // n is non-leaf with weight
+			sentence[n->weight] = n->currword; // treat like leaf node, add the word+weight to map
 		}
 		return sentence;
 	}
